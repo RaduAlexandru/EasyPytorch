@@ -83,7 +83,6 @@ inline cv::Mat tensor2mat(const torch::Tensor& tensor_in){
     at::ScalarType tensor_scalar_type; 
     tensor_scalar_type=tensor.scalar_type();
     int c=tensor.size(1);
-    VLOG(1) << "nr channels is " << c;
     // std::cout << "nr channels is " << c <<std::endl;
     //infer a good type for the cv mat and read the channels of the cv mat
     std::vector<cv::Mat> channels;
@@ -229,62 +228,5 @@ inline cv::Mat tensor2mat(const torch::Tensor& tensor_in){
         LOG(FATAL) << "Not a supported number of channels. c is " << c;
     }
 
-
-    // // OpenCV cannot build a Mat directly from 3 channels so make a separate Mat for each channel and then merge
-    // auto red_output = tensor.slice(1, 0, 1); //along dimensiom 1 (corresponding to the channels) go from 0,1 and get all the data along there
-    // auto green_output = tensor.slice(1, 1, 2);
-    // auto blue_output = tensor.slice(1, 2, 3);
-    
-    // // Initialize OpenCV variables
-    // cv::Mat red_output_mat(tensor.size(2), tensor_size(3), cv_mat_type, red_output.data<uint8_t>());
-    // cv::Mat green_output_mat({1920, 1080}, CV_8UC1, green_output.data<uint8_t>());
-    // cv::Mat blue_output_mat({1920, 1080}, CV_8UC1, blue_output.data<uint8_t>());
-    
-    // Mat final_img;
-    // vector<Mat> channels;
-    // channels.push_back(red_output_mat);
-    // channels.push_back(green_output_mat);
-    // channels.push_back(blue_output_mat);
-    // cv::merge(channels, final_img);
-    // cout<<fin_img.rows<<" "<<fin_img.cols<<endl;
-    
-    // Mat fin_img_bgr;
-    // cvtColor(fin_img, fin_img_bgr, COLOR_RGB2BGR);
-
-
-
-
-
-    // CHECK( cv_mat_bgr.isContinuous()) << "cv_mat should be continuous in memory because we will wrap it directly.";
-
-    // cv::Mat cv_mat;
-    // cvtColor(cv_mat_bgr, cv_mat, cv::COLOR_BGR2RGB);
-
-    // //get the scalar type of the tensor, the types supported by torch are here https://github.com/pytorch/pytorch/blob/1a742075ee97b9603001188eeec9c30c3fe8a161/torch/csrc/utils/python_scalars.h
-    // at::ScalarType tensor_scalar_type; 
-    // unsigned char cv_mat_type=er::utils::type2byteDepth(cv_mat.type());
-    // if(cv_mat_type==CV_8U ){
-    //     tensor_scalar_type=at::kByte;
-    // }else if(cv_mat_type==CV_32S ){
-    //     tensor_scalar_type=at::kInt;
-    // }else if(cv_mat_type==CV_32F ){
-    //     tensor_scalar_type=at::kFloat;
-    // }else if(cv_mat_type==CV_64F ){
-    //     tensor_scalar_type=at::kDouble;
-    // }
-
-
-    // int c=cv_mat.channels();
-    // int h=cv_mat.rows;
-    // int w=cv_mat.cols;
-
-    // // torch::Tensor wrapped_mat = torch::from_blob(cv_mat.data,  /*sizes=*/{ 1, 3, 512, 512 }, tensor_scalar_type);
-    // torch::Tensor wrapped_mat = torch::from_blob(cv_mat.data,  /*sizes=*/{ 1, h, w, c }, tensor_scalar_type); //opencv stores the mat in hwc format where c is the fastest changing and h is the slowest
-    // torch::Tensor tensor = wrapped_mat.clone(); //we have to take ownership of the data of the cv_mat, otherwise the cv_mat might go out of scope and then we will point to undefined data
-
-    // //we want a tensor oh nchw instead of nhwc
-    // tensor = tensor.permute({0, 3, 1, 2}); //the order in which we declared then dimensions is 0,1,2,3 and they go like 1,h,w,c. With this permute we put them in 0,3,1,2 so in 1,c,h,w
-
-    // return tensor;
     
 }
