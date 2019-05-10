@@ -19,6 +19,7 @@
 #define LOGURU_REPLACE_GLOG 1
 #include <loguru.hpp> //needs to be added after torch.h otherwise loguru stops printing for some reason
 
+typedef Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> EigenMatrixXfRowMajor;
 
 //grabs a cv mat in whatever type or nr of channels it has and returns a tensor of shape NCHW. Also converts from BGR to RGB
 inline torch::Tensor mat2tensor(const cv::Mat& cv_mat_bgr){
@@ -230,3 +231,34 @@ inline cv::Mat tensor2mat(const torch::Tensor& tensor_in){
 
     
 }
+
+//converts a RowMajor eigen matrix of size HW into a tensor of size 1HW
+inline torch::Tensor eigen2tensor(const EigenMatrixXfRowMajor& eigen_mat){
+
+    torch::Tensor wrapped_mat = torch::from_blob(const_cast<float*>(eigen_mat.data()),  /*sizes=*/{ 1, eigen_mat.rows(), eigen_mat.cols() }, at::kFloat); 
+    torch::Tensor tensor = wrapped_mat.clone(); //we have to take ownership of the data, otherwise the eigen_mat might go out of scope and then we will point to undefined data
+
+    return tensor;
+    
+}
+
+//converts tensor of shape 1hw into a RowMajor eigen matrix of size HW 
+inline EigenMatrixXfRowMajor tensor2eigen(const torch::Tensor& tensor_in){
+
+    torch::Tensor tensor=tensor_in.to(at::kCPU);
+
+    int rows=tensor.size(1);
+    int cols=tensor.size(2);
+
+    EigenMatrixXfRowMajor eigen_mat(rows,cols);
+    eigen_mat=Eigen::Map<EigenMatrixXfRowMajor> (tensor.data<float>(),rows,cols);
+
+    //make a deep copy of it because map does not actually take ownership
+    EigenMatrixXfRowMajor eigen_mat_copy;
+    eigen_mat_copy=eigen_mat;
+
+    return eigen_mat_copy;
+    
+}
+
+
