@@ -164,6 +164,16 @@ inline void display_c10_cuda_mem_stat(int32_t sleep_time) {
     std::this_thread::sleep_for(std::chrono::milliseconds(1000*sleep_time));
 }
 
+//converts a std::vector<float> to a one dimensional tensor with whatever size the vector has
+inline torch::Tensor vec2tensor(const std::vector<float>& vec){
+
+    torch::Tensor wrapped_mat = torch::from_blob(const_cast<float*>(vec.data() ),  /*sizes=*/{ (int)vec.size() }, at::kFloat); 
+    torch::Tensor tensor = wrapped_mat.clone(); //we have to take ownership of the data, otherwise the eigen_mat might go out of scope and then we will point to undefined data
+
+    return tensor;
+    
+}
+
 //empties cache used by cuda 
 inline void cuda_clear_cache(){
     c10::cuda::CUDACachingAllocator::emptyCache();
