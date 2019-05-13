@@ -134,8 +134,33 @@ inline torch::Tensor eigen2tensor(const EigenMatrixXfRowMajor& eigen_mat){
     
 }
 
+//converts a RowMajor eigen matrix of size HW cv::Mat of size XY 
+inline cv::Mat eigen2mat(const EigenMatrixXfRowMajor& eigen_mat, const int rows, const int cols){
+
+    CHECK(eigen_mat.rows()==rows*cols) << "We need a row in the eigen mat for each pixel in the image of the cv mat. However nr of rows in the eigen mat is " << eigen_mat.rows() << " while rows*cols of the cv mat is " <<rows*cols;
+
+    int cv_mat_type;
+    if(eigen_mat.cols()==1){
+        cv_mat_type=CV_32FC1;
+    }else if(eigen_mat.cols()==2){
+        cv_mat_type=CV_32FC2;
+    }else if(eigen_mat.cols()==3){
+        cv_mat_type=CV_32FC3;
+    }else if(eigen_mat.cols()==4){
+        cv_mat_type=CV_32FC4;
+    }
+
+    cv::Mat cv_mat (rows, cols, cv_mat_type, (void*)eigen_mat.data() );
+
+    return cv_mat.clone();
+    
+}
+
 //converts tensor of shape 1hw into a RowMajor eigen matrix of size HW 
 inline EigenMatrixXfRowMajor tensor2eigen(const torch::Tensor& tensor_in){
+
+    CHECK(tensor_in.dim()==3) << "The tensor should be a 3D one with shape NHW, however it has dim: " << tensor_in.dim();
+    CHECK(tensor_in.size(0)==1) << "The tensor should have only one batch, so the first dimension should be 1. However the sizes are: " << tensor_in.sizes();
 
     torch::Tensor tensor=tensor_in.to(at::kCPU);
 
@@ -152,6 +177,7 @@ inline EigenMatrixXfRowMajor tensor2eigen(const torch::Tensor& tensor_in){
     return eigen_mat_copy;
     
 }
+
 
 //prints the current cuda mem used, including cached memory. Taken from https://github.com/pytorch/pytorch/issues/17433
 inline void display_c10_cuda_mem_stat(int32_t sleep_time) {
