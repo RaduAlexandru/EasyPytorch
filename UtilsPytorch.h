@@ -161,6 +161,7 @@ inline EigenMatrixXfRowMajor tensor2eigen(const torch::Tensor& tensor_in){
 
     CHECK(tensor_in.dim()==3) << "The tensor should be a 3D one with shape NHW, however it has dim: " << tensor_in.dim();
     CHECK(tensor_in.size(0)==1) << "The tensor should have only one batch, so the first dimension should be 1. However the sizes are: " << tensor_in.sizes();
+    CHECK(tensor_in.scalar_type()==at::kFloat ) << "Tensor should be float. Didn't have time to write templates for this functions";
 
     torch::Tensor tensor=tensor_in.to(at::kCPU);
 
