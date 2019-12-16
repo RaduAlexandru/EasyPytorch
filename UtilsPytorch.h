@@ -11,7 +11,8 @@
 #include <iostream>
 
 //my stuff
-#include "surfel_renderer/utils/MiscUtils.h"
+// #include "surfel_renderer/utils/MiscUtils.h"
+#include "opencv_utils.h"
 
 //opencv
 #include "opencv2/opencv.hpp"
@@ -19,6 +20,8 @@
 //loguru
 #define LOGURU_REPLACE_GLOG 1
 #include <loguru.hpp> //needs to be added after torch.h otherwise loguru stops printing for some reason
+
+using namespace easy_pbr::utils;
 
 typedef Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> EigenMatrixXfRowMajor;
 
@@ -37,7 +40,7 @@ inline torch::Tensor mat2tensor(const cv::Mat& cv_mat_bgr){
 
     //get the scalar type of the tensor, the types supported by torch are here https://github.com/pytorch/pytorch/blob/1a742075ee97b9603001188eeec9c30c3fe8a161/torch/csrc/utils/python_scalars.h
     at::ScalarType tensor_scalar_type; 
-    unsigned char cv_mat_type=er::utils::type2byteDepth(cv_mat.type());
+    unsigned char cv_mat_type=type2byteDepth(cv_mat.type());
     if(cv_mat_type==CV_8U ){
         tensor_scalar_type=at::kByte;
     }else if(cv_mat_type==CV_32S ){
@@ -180,16 +183,16 @@ inline EigenMatrixXfRowMajor tensor2eigen(const torch::Tensor& tensor_in){
 }
 
 
-//prints the current cuda mem used, including cached memory. Taken from https://github.com/pytorch/pytorch/issues/17433
-inline void display_c10_cuda_mem_stat(int32_t sleep_time) {
-    printf("currentMemoryAllocated/[maxMemoryAllocated]: \t %0.1f/[%0.1f] MB\n ",
-        c10::cuda::CUDACachingAllocator::currentMemoryAllocated(0) / 1024.0 / 1024.0,
-        c10::cuda::CUDACachingAllocator::maxMemoryAllocated(0) / 1024.0 / 1024.0);
-    printf("currentMemoryCached/[maxMemoryCached]: \t %0.1f/[%0.1f] MB\n",
-        c10::cuda::CUDACachingAllocator::currentMemoryCached(0) / 1024.0 / 1024.0,
-        c10::cuda::CUDACachingAllocator::maxMemoryCached(0) / 1024.0 / 1024.0);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000*sleep_time));
-}
+// //prints the current cuda mem used, including cached memory. Taken from https://github.com/pytorch/pytorch/issues/17433
+// inline void display_c10_cuda_mem_stat(int32_t sleep_time) {
+//     printf("currentMemoryAllocated/[maxMemoryAllocated]: \t %0.1f/[%0.1f] MB\n ",
+//         c10::cuda::CUDACachingAllocator::currentMemoryAllocated(0) / 1024.0 / 1024.0,
+//         c10::cuda::CUDACachingAllocator::maxMemoryAllocated(0) / 1024.0 / 1024.0);
+//     printf("currentMemoryCached/[maxMemoryCached]: \t %0.1f/[%0.1f] MB\n",
+//         c10::cuda::CUDACachingAllocator::currentMemoryCached(0) / 1024.0 / 1024.0,
+//         c10::cuda::CUDACachingAllocator::maxMemoryCached(0) / 1024.0 / 1024.0);
+//     std::this_thread::sleep_for(std::chrono::milliseconds(1000*sleep_time));
+// }
 
 //converts a std::vector<float> to a one dimensional tensor with whatever size the vector has
 inline torch::Tensor vec2tensor(const std::vector<float>& vec){
