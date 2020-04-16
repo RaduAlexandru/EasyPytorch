@@ -21,7 +21,7 @@
 #define LOGURU_REPLACE_GLOG 1
 #include <loguru.hpp> //needs to be added after torch.h otherwise loguru stops printing for some reason
 
-using namespace easy_pbr::utils;
+using namespace radu::utils;
 
 typedef Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> EigenMatrixXfRowMajor;
 
