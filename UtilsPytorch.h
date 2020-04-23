@@ -172,7 +172,7 @@ inline EigenMatrixXfRowMajor tensor2eigen(const torch::Tensor& tensor_in){
     int cols=tensor.size(2);
 
     EigenMatrixXfRowMajor eigen_mat(rows,cols);
-    eigen_mat=Eigen::Map<EigenMatrixXfRowMajor> (tensor.data<float>(),rows,cols);
+    eigen_mat=Eigen::Map<EigenMatrixXfRowMajor> (tensor.data_ptr<float>(),rows,cols);
 
     //make a deep copy of it because map does not actually take ownership
     EigenMatrixXfRowMajor eigen_mat_copy;
