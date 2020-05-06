@@ -26,16 +26,16 @@ using namespace radu::utils;
 typedef Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> EigenMatrixXfRowMajor;
 
 //grabs a cv mat in whatever type or nr of channels it has and returns a tensor of shape NCHW. Also converts from BGR to RGB
-inline torch::Tensor mat2tensor(const cv::Mat& cv_mat_bgr){
-    CHECK( cv_mat_bgr.isContinuous()) << "cv_mat should be continuous in memory because we will wrap it directly.";
+inline torch::Tensor mat2tensor(const cv::Mat& mat_in, const bool& flip_red_blue=true){
+    CHECK( mat_in.isContinuous()) << "cv_mat should be continuous in memory because we will wrap it directly.";
 
     cv::Mat cv_mat;
-    if(cv_mat_bgr.channels()==3){
-        cvtColor(cv_mat_bgr, cv_mat, cv::COLOR_BGR2RGB);
-    }else if(cv_mat_bgr.channels()==4){
-        cvtColor(cv_mat_bgr, cv_mat, cv::COLOR_BGRA2RGBA);
+    if(mat_in.channels()==3 && flip_red_blue){
+        cvtColor(mat_in, cv_mat, cv::COLOR_BGR2RGB);
+    }else if(mat_in.channels()==4 && flip_red_blue){
+        cvtColor(mat_in, cv_mat, cv::COLOR_BGRA2RGBA);
     }else{
-        cv_mat=cv_mat_bgr;
+        cv_mat=mat_in;
     }
 
     //get the scalar type of the tensor, the types supported by torch are here https://github.com/pytorch/pytorch/blob/1a742075ee97b9603001188eeec9c30c3fe8a161/torch/csrc/utils/python_scalars.h
