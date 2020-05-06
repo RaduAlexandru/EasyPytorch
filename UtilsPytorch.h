@@ -27,15 +27,27 @@ typedef Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> Ei
 
 //grabs a cv mat in whatever type or nr of channels it has and returns a tensor of shape NCHW. Also converts from BGR to RGB
 inline torch::Tensor mat2tensor(const cv::Mat& mat_in, const bool flip_red_blue){
-    CHECK( mat_in.isContinuous()) << "cv_mat should be continuous in memory because we will wrap it directly.";
+
+    CHECK(mat_in.data) << "The input mat has no data or is empty";
+
+    //make continous if it's not
+    cv::Mat cv_mat_cont;
+    if(!mat_in.isContinuous()){
+        cv_mat_cont=mat_in.clone(); //cloning makes it continous
+    }else{
+        cv_mat_cont=mat_in;
+    }
+
+
+    CHECK( cv_mat_cont.isContinuous()) << "cv_mat should be continuous in memory because we will wrap it directly.";
 
     cv::Mat cv_mat;
-    if(mat_in.channels()==3 && flip_red_blue){
-        cvtColor(mat_in, cv_mat, cv::COLOR_BGR2RGB);
-    }else if(mat_in.channels()==4 && flip_red_blue){
-        cvtColor(mat_in, cv_mat, cv::COLOR_BGRA2RGBA);
+    if(cv_mat_cont.channels()==3 && flip_red_blue){
+        cvtColor(cv_mat_cont, cv_mat, cv::COLOR_BGR2RGB);
+    }else if(cv_mat_cont.channels()==4 && flip_red_blue){
+        cvtColor(cv_mat_cont, cv_mat, cv::COLOR_BGRA2RGBA);
     }else{
-        cv_mat=mat_in;
+        cv_mat=cv_mat_cont;
     }
 
     //get the scalar type of the tensor, the types supported by torch are here https://github.com/pytorch/pytorch/blob/1a742075ee97b9603001188eeec9c30c3fe8a161/torch/csrc/utils/python_scalars.h
