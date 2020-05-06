@@ -26,7 +26,7 @@ using namespace radu::utils;
 typedef Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> EigenMatrixXfRowMajor;
 
 //grabs a cv mat in whatever type or nr of channels it has and returns a tensor of shape NCHW. Also converts from BGR to RGB
-inline torch::Tensor mat2tensor(const cv::Mat& mat_in, const bool& flip_red_blue=true){
+inline torch::Tensor mat2tensor(const cv::Mat& mat_in, const bool flip_red_blue){
     CHECK( mat_in.isContinuous()) << "cv_mat should be continuous in memory because we will wrap it directly.";
 
     cv::Mat cv_mat;
