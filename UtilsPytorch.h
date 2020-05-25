@@ -127,13 +127,14 @@ inline cv::Mat tensor2mat(const torch::Tensor& tensor_in){
     //we merge the channels and return the final image
     cv::Mat merged_mat;
     cv::merge(channels, merged_mat);
-    if(c==3){
-        cvtColor(merged_mat, final_mat, cv::COLOR_BGR2RGB);
-    }else if(c==4){
-        cvtColor(merged_mat, final_mat, cv::COLOR_BGRA2RGBA);
-    }else{
-        final_mat=merged_mat;
-    }
+    // if(c==3){
+    //     cvtColor(merged_mat, final_mat, cv::COLOR_BGR2RGB);
+    // }else if(c==4){
+    //     cvtColor(merged_mat, final_mat, cv::COLOR_BGRA2RGBA);
+    // }else{
+    //     final_mat=merged_mat;
+    // }
+    final_mat =merged_mat;
     return final_mat;
 
 
