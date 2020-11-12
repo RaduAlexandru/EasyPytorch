@@ -76,7 +76,7 @@ inline torch::Tensor mat2tensor(const cv::Mat& mat_in, const bool flip_red_blue)
     torch::Tensor tensor = wrapped_mat.clone(); //we have to take ownership of the data of the cv_mat, otherwise the cv_mat might go out of scope and then we will point to undefined data
 
     //we want a tensor oh nchw instead of nhwc
-    tensor = tensor.permute({0, 3, 1, 2}); //the order in which we declared then dimensions is 0,1,2,3 and they go like 1,h,w,c. With this permute we put them in 0,3,1,2 so in 1,c,h,w
+    tensor = tensor.permute({0, 3, 1, 2}).contiguous(); //the order in which we declared then dimensions is 0,1,2,3 and they go like 1,h,w,c. With this permute we put them in 0,3,1,2 so in 1,c,h,w
 
     // std::cout << "mat2tensor. output a tensor of size" << tensor.sizes();
     return tensor;
@@ -92,7 +92,7 @@ inline cv::Mat tensor2mat(const torch::Tensor& tensor_in){
 
     // std::cout << "tensor2mat. Received a tensor of size" << tensor_in.sizes();
 
-    torch::Tensor tensor=tensor_in.to(at::kCPU);
+    torch::Tensor tensor=tensor_in.to(at::kCPU).contiguous();
 
     //get type of tensor
     at::ScalarType tensor_scalar_type; 
