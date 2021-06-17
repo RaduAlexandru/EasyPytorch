@@ -51,7 +51,7 @@ inline torch::Tensor mat2tensor(const cv::Mat& mat_in, const bool flip_red_blue)
     }
 
     //get the scalar type of the tensor, the types supported by torch are here https://github.com/pytorch/pytorch/blob/1a742075ee97b9603001188eeec9c30c3fe8a161/torch/csrc/utils/python_scalars.h
-    at::ScalarType tensor_scalar_type; 
+    at::ScalarType tensor_scalar_type;
     unsigned char cv_mat_type=type2byteDepth(cv_mat.type());
     if(cv_mat_type==CV_8U ){
         tensor_scalar_type=at::kByte;
@@ -80,7 +80,7 @@ inline torch::Tensor mat2tensor(const cv::Mat& mat_in, const bool flip_red_blue)
 
     // std::cout << "mat2tensor. output a tensor of size" << tensor.sizes();
     return tensor;
-    
+
 }
 
 //converts a tensor from nchw to a cv mat. Assumes the number of batches N is 1
@@ -95,7 +95,7 @@ inline cv::Mat tensor2mat(const torch::Tensor& tensor_in){
     torch::Tensor tensor=tensor_in.to(at::kCPU).contiguous();
 
     //get type of tensor
-    at::ScalarType tensor_scalar_type; 
+    at::ScalarType tensor_scalar_type;
     tensor_scalar_type=tensor.scalar_type();
     int c=tensor.size(1);
 
@@ -143,14 +143,14 @@ inline cv::Mat tensor2mat(const torch::Tensor& tensor_in){
 //converts a RowMajor eigen matrix of size HW into a tensor of size 1HW
 inline torch::Tensor eigen2tensor(const EigenMatrixXfRowMajor& eigen_mat){
 
-    torch::Tensor wrapped_mat = torch::from_blob(const_cast<float*>(eigen_mat.data()),  /*sizes=*/{ 1, eigen_mat.rows(), eigen_mat.cols() }, at::kFloat); 
+    torch::Tensor wrapped_mat = torch::from_blob(const_cast<float*>(eigen_mat.data()),  /*sizes=*/{ 1, eigen_mat.rows(), eigen_mat.cols() }, at::kFloat);
     torch::Tensor tensor = wrapped_mat.clone(); //we have to take ownership of the data, otherwise the eigen_mat might go out of scope and then we will point to undefined data
 
     return tensor;
-    
+
 }
 
-//converts a RowMajor eigen matrix of size HW cv::Mat of size XY 
+//converts a RowMajor eigen matrix of size HW cv::Mat of size XY
 inline cv::Mat eigen2mat(const EigenMatrixXfRowMajor& eigen_mat, const int rows, const int cols){
 
     CHECK(eigen_mat.rows()==rows*cols) << "We need a row in the eigen mat for each pixel in the image of the cv mat. However nr of rows in the eigen mat is " << eigen_mat.rows() << " while rows*cols of the cv mat is " <<rows*cols;
@@ -169,10 +169,10 @@ inline cv::Mat eigen2mat(const EigenMatrixXfRowMajor& eigen_mat, const int rows,
     cv::Mat cv_mat (rows, cols, cv_mat_type, (void*)eigen_mat.data() );
 
     return cv_mat.clone();
-    
+
 }
 
-//converts tensor of shape 1hw into a RowMajor eigen matrix of size HW 
+//converts tensor of shape 1hw into a RowMajor eigen matrix of size HW
 inline EigenMatrixXfRowMajor tensor2eigen(const torch::Tensor& tensor_in){
 
     CHECK(tensor_in.dim()==3) << "The tensor should be a 3D one with shape NHW, however it has dim: " << tensor_in.dim();
@@ -192,7 +192,7 @@ inline EigenMatrixXfRowMajor tensor2eigen(const torch::Tensor& tensor_in){
     eigen_mat_copy=eigen_mat;
 
     return eigen_mat_copy;
-    
+
 }
 
 
@@ -210,16 +210,14 @@ inline EigenMatrixXfRowMajor tensor2eigen(const torch::Tensor& tensor_in){
 //converts a std::vector<float> to a one dimensional tensor with whatever size the vector has
 inline torch::Tensor vec2tensor(const std::vector<float>& vec){
 
-    torch::Tensor wrapped_mat = torch::from_blob(const_cast<float*>(vec.data() ),  /*sizes=*/{ (int)vec.size() }, at::kFloat); 
+    torch::Tensor wrapped_mat = torch::from_blob(const_cast<float*>(vec.data() ),  /*sizes=*/{ (int)vec.size() }, at::kFloat);
     torch::Tensor tensor = wrapped_mat.clone(); //we have to take ownership of the data, otherwise the eigen_mat might go out of scope and then we will point to undefined data
 
     return tensor;
-    
+
 }
 
-//empties cache used by cuda 
+//empties cache used by cuda
 inline void cuda_clear_cache(){
     c10::cuda::CUDACachingAllocator::emptyCache();
 }
-
-
