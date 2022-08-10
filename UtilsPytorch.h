@@ -140,10 +140,10 @@ inline cv::Mat tensor2mat(const torch::Tensor& tensor_in){
 
 }
 
-//converts a RowMajor eigen matrix of size HW into a tensor of size 1HW
+//converts a RowMajor eigen matrix of size HW into a tensor of size HW
 inline torch::Tensor eigen2tensor(const EigenMatrixXfRowMajor& eigen_mat){
 
-    torch::Tensor wrapped_mat = torch::from_blob(const_cast<float*>(eigen_mat.data()),  /*sizes=*/{ 1, eigen_mat.rows(), eigen_mat.cols() }, at::kFloat);
+    torch::Tensor wrapped_mat = torch::from_blob(const_cast<float*>(eigen_mat.data()),  /*sizes=*/{ eigen_mat.rows(), eigen_mat.cols() }, at::kFloat);
     torch::Tensor tensor = wrapped_mat.clone(); //we have to take ownership of the data, otherwise the eigen_mat might go out of scope and then we will point to undefined data
 
     return tensor;
@@ -172,17 +172,16 @@ inline cv::Mat eigen2mat(const EigenMatrixXfRowMajor& eigen_mat, const int rows,
 
 }
 
-//converts tensor of shape 1hw into a RowMajor eigen matrix of size HW
+//converts tensor of shape hw into a RowMajor eigen matrix of size HW
 inline EigenMatrixXfRowMajor tensor2eigen(const torch::Tensor& tensor_in){
 
-    CHECK(tensor_in.dim()==3) << "The tensor should be a 3D one with shape NHW, however it has dim: " << tensor_in.dim();
-    CHECK(tensor_in.size(0)==1) << "The tensor should have only one batch, so the first dimension should be 1. However the sizes are: " << tensor_in.sizes();
+    CHECK(tensor_in.dim()==2) << "The tensor should be a 2D one with shape HW, however it has dim: " << tensor_in.dim();
     CHECK(tensor_in.scalar_type()==at::kFloat ) << "Tensor should be float. Didn't have time to write templates for this functions";
 
     torch::Tensor tensor=tensor_in.to(at::kCPU);
 
-    int rows=tensor.size(1);
-    int cols=tensor.size(2);
+    int rows=tensor.size(0);
+    int cols=tensor.size(1);
 
     EigenMatrixXfRowMajor eigen_mat(rows,cols);
     eigen_mat=Eigen::Map<EigenMatrixXfRowMajor> (tensor.data_ptr<float>(),rows,cols);
