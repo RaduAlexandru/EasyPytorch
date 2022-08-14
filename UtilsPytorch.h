@@ -62,6 +62,7 @@ inline torch::Tensor mat2tensor(const cv::Mat& mat_in, const bool flip_red_blue)
     }else if(cv_mat_type==CV_64F ){
         tensor_scalar_type=at::kDouble;
     }else{
+        tensor_scalar_type=at::kFloat; //this line doesn't matter since we do a log(fatal) afterwards but this is here so that the compiler doesn't complain about uninitialzied variable
         LOG(FATAL) << "Not a supported type of cv mat";
     }
 
