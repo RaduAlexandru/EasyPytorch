@@ -101,7 +101,7 @@ inline cv::Mat tensor2mat(const torch::Tensor& tensor_in){
     int c=tensor.size(1);
 
     std::vector<cv::Mat> channels;
-    int cv_mat_type;
+    int cv_mat_type=-1;
     cv::Mat final_mat;
     if(tensor_scalar_type==at::kByte ){
         cv_mat_type=CV_8UC1;
