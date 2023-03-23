@@ -156,7 +156,7 @@ inline cv::Mat eigen2mat(const EigenMatrixXfRowMajor& eigen_mat, const int rows,
 
     CHECK(eigen_mat.rows()==rows*cols) << "We need a row in the eigen mat for each pixel in the image of the cv mat. However nr of rows in the eigen mat is " << eigen_mat.rows() << " while rows*cols of the cv mat is " <<rows*cols;
 
-    int cv_mat_type;
+    int cv_mat_type=-1;
     if(eigen_mat.cols()==1){
         cv_mat_type=CV_32FC1;
     }else if(eigen_mat.cols()==2){
